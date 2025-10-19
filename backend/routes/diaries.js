@@ -1,8 +1,9 @@
-import OpenAI from 'openai';
+const express = require('express');
+const OpenAI = require('openai');
+const router = express.Router();
 
 const client = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const DIARY_PROMPT = `
@@ -38,24 +39,27 @@ Diary entry:
 ---
 `;
 
-interface GetRevisedContentsResponse {
-  corrected: string;
-  changes: {
-    original: string;
-    corrected: string;
-    reason: string;
-    alternative: string;
-  }[];
-}
+router.post('/revise', async (req, res) => {
+  try {
+    const { contents } = req.body;
 
-export const getRevisedContents = async (contents: string) => {
-  const response = await client.responses.create({
-    model: 'gpt-4o',
-    instructions: DIARY_PROMPT,
-    input: `user_diary: ${contents}`,
-  });
+    const response = await client.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'user',
+          content: DIARY_PROMPT.replace('{{user_diary}}', contents),
+        },
+      ],
+      temperature: 0.3,
+    });
 
-  const data: GetRevisedContentsResponse = JSON.parse(response.output_text);
+    const data = JSON.parse(response.choices[0].message.content);
+    res.json(data);
+  } catch (error) {
+    console.error('OpenAI API 오류:', error);
+    res.status(500).json({ error: '교정 처리 중 오류가 발생했습니다.' });
+  }
+});
 
-  return data;
-};
+module.exports = router;

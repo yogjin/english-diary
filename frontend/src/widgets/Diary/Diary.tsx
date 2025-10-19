@@ -3,6 +3,7 @@ import { Textarea } from '../../components/ui/textarea';
 import { useState } from 'react';
 import { getTodayDate } from './utils';
 import { getRevisedContents } from './apis';
+import Title from './parts/Title';
 
 const Diary = () => {
   const [diaryText, setDiaryText] = useState('');
@@ -40,13 +41,7 @@ const Diary = () => {
 
   return (
     <>
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-4">
-          매일 영어로 일기를 쓰고 교정받으세요
-        </h2>
-        <p className="text-gray-600">영어 일기를 작성하고 AI가 문법과 표현을 교정해드립니다</p>
-      </div>
-
+      <Title />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 min-h-[500px]">
         <div className="h-full">
           <div>
@@ -79,8 +74,6 @@ const Diary = () => {
             readOnly
             value={correctedText}
           />
-
-          {/* 변경사항 표시 */}
           {changes.length > 0 && (
             <div className="mt-4">
               <h4 className="text-md font-semibold mb-2 text-gray-700">교정 내용</h4>
