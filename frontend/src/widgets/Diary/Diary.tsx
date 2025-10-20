@@ -1,8 +1,9 @@
 import { Button } from '../../components/ui/button';
 import { Textarea } from '../../components/ui/textarea';
+import { Mutation } from '@suspensive/react-query';
 import { useState } from 'react';
 import { getTodayDate } from './utils';
-import { getRevisedContents } from './apis';
+import { reviseDiaryMutationOptions } from './models';
 import Title from './parts/Title';
 
 const Diary = () => {
@@ -16,28 +17,6 @@ const Diary = () => {
       alternative: string;
     }[]
   >([]);
-  const [isCorrecting, setIsCorrecting] = useState(false);
-
-  const reviseDiary = async () => {
-    if (!diaryText.trim()) {
-      alert('일기를 작성해주세요!');
-      return;
-    }
-
-    setIsCorrecting(true);
-
-    try {
-      const data = await getRevisedContents(diaryText);
-      console.log(data);
-      setCorrectedText(data.corrected);
-      setChanges(data.changes);
-    } catch (error) {
-      console.error('교정 중 오류가 발생했습니다:', error);
-      alert('교정 중 오류가 발생했습니다. 다시 시도해주세요.');
-    } finally {
-      setIsCorrecting(false);
-    }
-  };
 
   return (
     <>
@@ -57,13 +36,27 @@ const Diary = () => {
             onChange={(e) => setDiaryText(e.target.value)}
           />
           <div className="mt-4 text-center">
-            <Button
-              onClick={reviseDiary}
-              disabled={!diaryText.trim() || isCorrecting}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2"
-            >
-              {isCorrecting ? '교정 중...' : '교정하기'}
-            </Button>
+            <Mutation {...reviseDiaryMutationOptions}>
+              {({ mutate, isPending }) => (
+                <Button
+                  onClick={() =>
+                    mutate(diaryText, {
+                      onSuccess: ({ corrected, changes }) => {
+                        setCorrectedText(corrected);
+                        setChanges(changes);
+                      },
+                      onError: () => {
+                        alert('교정 중 오류가 발생했습니다. 다시 시도해주세요.');
+                      },
+                    })
+                  }
+                  disabled={!diaryText.trim() || isPending}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2"
+                >
+                  {isPending ? '교정 중...' : '교정하기'}
+                </Button>
+              )}
+            </Mutation>
           </div>
         </div>
         <div className="h-full">
