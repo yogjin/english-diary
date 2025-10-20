@@ -1,4 +1,4 @@
-interface GetRevisedContentsResponse {
+interface PostReviseDiaryResponse {
   corrected: string;
   changes: {
     original: string;
@@ -10,14 +10,14 @@ interface GetRevisedContentsResponse {
 
 const API_BASE_URL = import.meta.env.VITE_API_URL;
 
-export const getRevisedContents = async (contents: string): Promise<GetRevisedContentsResponse> => {
+export const postReviseDiary = async (diaryText: string): Promise<PostReviseDiaryResponse> => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/diary/revise`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ contents }),
+      body: JSON.stringify({ diaryText }),
     });
 
     if (!response.ok) {
@@ -25,7 +25,7 @@ export const getRevisedContents = async (contents: string): Promise<GetRevisedCo
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
 
-    const data: GetRevisedContentsResponse = await response.json();
+    const data: PostReviseDiaryResponse = await response.json();
     return data;
   } catch (error) {
     console.error('API 호출 중 오류 발생:', error);

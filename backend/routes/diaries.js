@@ -41,14 +41,14 @@ Diary entry:
 
 router.post('/revise', async (req, res) => {
   try {
-    const { contents } = req.body;
+    const { diaryText } = req.body;
 
     const response = await client.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         {
           role: 'user',
-          content: DIARY_PROMPT.replace('{{user_diary}}', contents),
+          content: DIARY_PROMPT.replace('{{user_diary}}', diaryText),
         },
       ],
       temperature: 0.3,
