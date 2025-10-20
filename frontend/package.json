@@ -12,7 +12,9 @@
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
     "@suspensive/react": "^3.12.0",
+    "@suspensive/react-query": "^3.12.0",
     "@tailwindcss/vite": "^4.1.14",
+    "@tanstack/react-query": "^5.90.5",
     "antd": "^5.27.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
